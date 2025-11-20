@@ -3,8 +3,8 @@ import App from './App';
 import { describe, it, expect } from 'vitest';
 
 describe('App', () => {
-    it('renders headline', () => {
+    it('renders dashboard', () => {
         render(<App />);
-        expect(screen.getByText(/Vite \+ React/i)).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: /agent control panel/i })).toBeInTheDocument();
     });
 });
