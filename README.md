@@ -15,7 +15,7 @@ A modern web application for controlling and monitoring AI agents powered by Cla
 
 - Node.js 18+ 
 - npm or yarn
-- Anthropic API Key ([get one here](https://console.anthropic.com/))
+- **Claude CLI** installed and authenticated (`npm install -g @anthropic-ai/claude-code`)
 
 ## Getting Started
 
@@ -33,9 +33,16 @@ cd server && npm install && cd ..
 Create a `.env` file in the root directory:
 
 ```bash
-ANTHROPIC_API_KEY=your_api_key_here
 PORT=3001
 FRONTEND_URL=http://localhost:5173
+```
+
+### 3. Authenticate Claude
+
+Ensure you have authenticated the Claude CLI on your machine:
+
+```bash
+claude login
 ```
 
 ### 3. Run the Application

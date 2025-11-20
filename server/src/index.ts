@@ -30,19 +30,12 @@ const server = app.listen(PORT, () => {
 // Initialize WebSocket server
 const wss = new WebSocketServer({ server });
 
-// Initialize Agent Manager
-const apiKey = process.env.ANTHROPIC_API_KEY;
-if (!apiKey) {
-    console.error('❌ ANTHROPIC_API_KEY is not set in environment variables');
-    console.error('Please create a .env file with your API key');
-    process.exit(1);
-}
-
-const agentManager = new AgentManager(apiKey);
+// Initialize Agent Manager (uses local claude CLI)
+const agentManager = new AgentManager();
 new WebSocketHandler(wss, agentManager);
 
 console.log('✅ WebSocket server initialized');
-console.log('✅ Agent manager ready');
+console.log('✅ Agent manager ready (using local Claude Code CLI)');
 
 // Graceful shutdown
 process.on('SIGTERM', () => {

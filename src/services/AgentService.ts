@@ -14,6 +14,8 @@ export class AgentService {
     private reconnectAttempts = 0;
     private maxReconnectAttempts = 5;
 
+    private currentProjectId: string | null = null;
+
     constructor(private url: string = 'ws://localhost:3001') { }
 
     connect(): Promise<void> {
@@ -24,6 +26,13 @@ export class AgentService {
                 this.ws.onopen = () => {
                     console.log('✅ Connected to agent server');
                     this.reconnectAttempts = 0;
+
+                    // Auto-restore session if we have a project ID
+                    if (this.currentProjectId) {
+                        console.log('Restoring session for project:', this.currentProjectId);
+                        this.createSession(this.currentProjectId);
+                    }
+
                     resolve();
                 };
 
@@ -75,6 +84,7 @@ export class AgentService {
     }
 
     createSession(projectId: string): void {
+        this.currentProjectId = projectId;
         this.send({
             type: 'create_session',
             payload: { projectId },

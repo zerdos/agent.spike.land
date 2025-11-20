@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a full-stack TypeScript application for managing and controlling AI agents. It consists of:
 - **Frontend**: React + Vite application with real-time WebSocket communication
-- **Backend**: Express server with WebSocket support that manages agent sessions via Anthropic API
+- **Backend**: Express server with WebSocket support that manages agent sessions by invoking the local Claude Code CLI
 
 ## Development Commands
 
@@ -31,9 +31,10 @@ npm run test         # Run backend tests
 ```
 
 ### Running the Full Application
-1. Copy `.env.example` to `.env` and add your `ANTHROPIC_API_KEY`
-2. Start backend: `cd server && npm run dev`
-3. Start frontend: `npm run dev` (in root directory)
+1. Ensure Claude Code CLI is installed and authenticated (`claude --version` should work)
+2. Copy `.env.example` to `.env` (no API key needed)
+3. Start backend: `cd server && npm run dev`
+4. Start frontend: `npm run dev` (in root directory)
 
 ## Architecture
 
@@ -58,7 +59,8 @@ The application uses a bidirectional WebSocket protocol between frontend and bac
 
 **AgentManager** (`AgentManager.ts`): Core agent session lifecycle manager
 - Manages multiple concurrent agent sessions via Map
-- Wraps Anthropic SDK for streaming Claude API calls
+- Spawns `claude` CLI processes using Node's `child_process.spawn()`
+- Parses and streams CLI output (removing ANSI codes, tool indicators, etc.)
 - Tracks session state (idle/busy/error) and activity timestamps
 - Sessions are identified by unique IDs generated on creation
 
@@ -70,8 +72,8 @@ The application uses a bidirectional WebSocket protocol between frontend and bac
 
 **Server Entry** (`index.ts`): Express + WebSocket server initialization
 - Configures CORS for frontend origin
-- Validates ANTHROPIC_API_KEY on startup
 - Wires together AgentManager and WebSocketHandler
+- Note: No API key validation needed - uses local Claude Code CLI authentication
 
 ### Frontend Structure (src/)
 
@@ -117,9 +119,14 @@ Shared types between frontend and backend are duplicated (not ideal but current 
 
 ## Environment Variables
 
-Required environment variables (see `.env.example`):
-- `ANTHROPIC_API_KEY`: API key for Claude access (backend only)
+Optional environment variables (see `.env.example`):
 - `PORT`: Backend server port (default: 3001)
 - `FRONTEND_URL`: CORS allowed origin (default: http://localhost:5173)
 
-The backend validates `ANTHROPIC_API_KEY` on startup and exits if missing.
+## Prerequisites
+
+The backend requires the Claude Code CLI to be installed and authenticated:
+- Install: Follow instructions at https://claude.ai/code
+- Verify: Run `claude --version` to ensure it's available in PATH
+- The backend spawns `claude` processes using your authenticated session
+- No separate API key needed - uses your Claude Code subscription
