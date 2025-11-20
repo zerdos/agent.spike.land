@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Project } from '../../types';
 import AgentStats from '../AgentStats/AgentStats';
 import ProjectCard from '../ProjectCard/ProjectCard';
+import AgentConsole from '../AgentConsole/AgentConsole';
 import './Dashboard.css';
 
 // Mock data - will be replaced with real data later
@@ -32,11 +34,23 @@ const mockProjects: Project[] = [
 ];
 
 export default function Dashboard() {
+    const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+
     const totalAgents = mockProjects.reduce((sum, project) => sum + project.agentCount, 0);
     const activeAgents = mockProjects
         .filter(p => p.status === 'active')
         .reduce((sum, project) => sum + project.agentCount, 0);
     const offlineAgents = totalAgents - activeAgents;
+
+    // If a project is selected, show the agent console
+    if (selectedProjectId) {
+        return (
+            <AgentConsole
+                projectId={selectedProjectId}
+                onClose={() => setSelectedProjectId(null)}
+            />
+        );
+    }
 
     return (
         <div className="dashboard">
@@ -57,7 +71,9 @@ export default function Dashboard() {
                 <h2>Projects</h2>
                 <div className="projects-grid">
                     {mockProjects.map(project => (
-                        <ProjectCard key={project.id} project={project} />
+                        <div key={project.id} onClick={() => setSelectedProjectId(project.id)}>
+                            <ProjectCard project={project} />
+                        </div>
                     ))}
                 </div>
             </section>
